@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Application context definition. -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	 xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/jdbc/spring-jdbc.xsd"
+	default-autowire="byName">
+
+		<!--spring自动注入-->
+	<context:annotation-config/>
+	<context:component-scan base-package="com.seven"/>
+
+    <bean id="abstractBaseTransaction"
+          class="com.seven.transaction.AbstractBaseTransaction"
+          abstract="true">
+    </bean>
+    <bean id="abstractBaseProcess"
+          class="com.seven.transaction.AbstractBaseTransaction"
+          abstract="true">
+    </bean>
+
+    <bean id="notifyTranscation"
+          class="com.seven.transaction.impl.NotifyTranscation"
+          parent="abstractBaseTransaction">
+        <property name="baseBiz" ref="notifyBiz" />
+    </bean>
+
+    <bean id="notifyNoTransTypeTranscation"
+          class="com.seven.transaction.impl.NotifyTranscation"
+          parent="abstractBaseTransaction">
+        <property name="baseBiz" ref="notifyBiz" />
+    </bean>
+
+	<bean id="notifyBiz" class="com.seven.biz.impl.NotifyBizImpl">
+		<property name="process" ref="notifyProcess" />
+	</bean>
+
+
+
+
+
+    <bean id="notifyProcess" class="com.seven.biz.process.impl.NotifyProcess" parent="abstractBaseProcess">
+        <property name="handlers">
+            <list>
+                <ref bean="notifyStep1Handler"></ref>
+                <ref bean="notifyStep2Handler"></ref>
+            </list>
+        </property>
+        <property name="exceptionHandlers">
+            <list>
+                <ref bean="notifyExceptionHandler"></ref>
+            </list>
+        </property>
+        <property name="finallyHandlers">
+            <list>
+                <ref bean="notifyFinallyHandler"></ref>
+            </list>
+        </property>
+    </bean>
+
+
+
+    <bean id="notifyStep1Handler" class="com.seven.biz.handler.impl.NotifyStep1Handler">
+    </bean>
+    <bean id="notifyStep2Handler" class="com.seven.biz.handler.impl.NotifyStep2Handler">
+    </bean>
+
+    <bean id="notifyFinallyHandler" class="com.seven.biz.handler.impl.NotifyFinallyHandler">
+    </bean>
+    <bean id="notifyExceptionHandler" class="com.seven.biz.handler.impl.NotifyExceptionHandler">
+    </bean>
+</beans>
